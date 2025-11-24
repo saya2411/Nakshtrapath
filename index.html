@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nakshatrapatha</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: linear-gradient(to bottom, #0a0e27 0%, #1a1a2e 50%, #16213e 100%);
+            height: 100vh;
+            transition: background 0.5s ease;
+        }
+        
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="sky"></canvas>
+    
+    <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-family: Arial, sans-serif; font-size: 14px; text-align: center;">
+        Click anywhere to create shooting stars ✨
+    </div>
+    
+    <div id="counter" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.8); font-family: Arial, sans-serif; font-size: 20px; text-align: center; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 8px; backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3);">
+        🌠 <span id="count">0</span>
+    </div>
+    
+    <button id="soundToggle" style="position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); padding: 10px 14px; border-radius: 50%; font-family: Arial, sans-serif; font-size: 18px; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+        🔇
+    </button>
+    
+    <button id="themeToggle" style="position: fixed; top: 20px; left: 20px; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); padding: 10px 14px; border-radius: 50%; font-family: Arial, sans-serif; font-size: 18px; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+        🎨
+    </button>
+    
+    <button id="infoBtn" style="position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); padding: 10px 14px; border-radius: 50%; font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+        i
+    </button>
+    
+    <button id="screenshotBtn" style="position: fixed; bottom: 20px; left: 20px; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); padding: 10px 14px; border-radius: 50%; font-family: Arial, sans-serif; font-size: 18px; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.3s ease; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+        📸
+    </button>
+    
+    <div id="guideModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; backdrop-filter: blur(5px);">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 40, 0.95); padding: 30px; border-radius: 20px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; border: 2px solid rgba(255,255,255,0.3);">
+            <h2 style="color: rgba(255,255,255,0.95); font-family: Arial, sans-serif; margin: 0 0 20px 0; text-align: center;">✨ Nakshatrapatha Guide</h2>
+            
+            <div style="color: rgba(255,255,255,0.85); font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6;">
+                <h3 style="color: rgba(255,255,255,0.9); margin: 15px 0 10px 0;">🌟 What is "Wishes Made"?</h3>
+                <p style="margin: 5px 0;">Every time you click to create a shooting star, you're making a wish! The counter tracks how many wishes you've made. Every 5 wishes, you'll receive a beautiful manifestation message.</p>
+                
+                <h3 style="color: rgba(255,255,255,0.9); margin: 15px 0 10px 0;">🎨 Color Themes</h3>
+                <p style="margin: 5px 0;"><strong>Blue Night:</strong> Classic deep blue starry night</p>
+                <p style="margin: 5px 0;"><strong>Purple Dream:</strong> Mystical purple/violet atmosphere</p>
+                <p style="margin: 5px 0;"><strong>Aurora:</strong> Green-tinted northern lights</p>
+                <p style="margin: 5px 0;"><strong>Mars Sky:</strong> Reddish alien planet vibe</p>
+                
+                <h3 style="color: rgba(255,255,255,0.9); margin: 15px 0 10px 0;">⌨️ Keyboard Shortcuts</h3>
+                <p style="margin: 5px 0;"><strong>Space:</strong> Create a meteor shower (5 shooting stars)</p>
+                <p style="margin: 5px 0;"><strong>R:</strong> Reset your wishes counter to 0</p>
+                
+                <h3 style="color: rgba(255,255,255,0.9); margin: 15px 0 10px 0;">🎵 Features</h3>
+                <p style="margin: 5px 0;">• Click anywhere to create shooting stars with sound</p>
+                <p style="margin: 5px 0;">• Toggle ambient music on/off</p>
+                <p style="margin: 5px 0;">• Switch between 4 beautiful themes</p>
+                <p style="margin: 5px 0;">• Take screenshots of your starry sky</p>
+                <p style="margin: 5px 0;">• Stars twinkle automatically</p>
+                <p style="margin: 5px 0;">• Random shooting stars appear naturally</p>
+                <p style="margin: 5px 0;">• Manifestation messages every 5 wishes</p>
+            </div>
+            
+            <button id="closeGuide" style="margin-top: 20px; width: 100%; background: rgba(100,150,255,0.3); border: 2px solid rgba(100,150,255,0.5); color: rgba(255,255,255,0.9); padding: 12px; border-radius: 10px; font-family: Arial, sans-serif; font-size: 14px; cursor: pointer; transition: all 0.3s ease;">
+                Got it! ✨
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('sky');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const themes = {
+            blue: {
+                name: 'Blue Night',
+                gradient: 'linear-gradient(to bottom, #0a0e27 0%, #1a1a2e 50%, #16213e 100%)',
+                starColor: '255, 255, 255'
+            },
+            purple: {
+                name: 'Purple Dream',
+                gradient: 'linear-gradient(to bottom, #1a0a27 0%, #2e1a3e 50%, #3e1647 100%)',
+                starColor: '255, 230, 255'
+            },
+            green: {
+                name: 'Aurora',
+                gradient: 'linear-gradient(to bottom, #0a1a1a 0%, #1a2e2e 50%, #16473e 100%)',
+                starColor: '200, 255, 230'
+            },
+            red: {
+                name: 'Mars Sky',
+                gradient: 'linear-gradient(to bottom, #270a0a 0%, #3e1a1a 50%, #471616 100%)',
+                starColor: '255, 200, 200'
+            }
+        };
+        
+        let currentTheme = 'blue';
+        
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let ambientSound = null;
+        let soundEnabled = false;
+        
+        function createAmbientSound() {
+            if (ambientSound) return;
+            
+            const osc1 = audioContext.createOscillator();
+            const osc2 = audioContext.createOscillator();
+            const osc3 = audioContext.createOscillator();
+            
+            const gain1 = audioContext.createGain();
+            const gain2 = audioContext.createGain();
+            const gain3 = audioContext.createGain();
+            const masterGain = audioContext.createGain();
+            
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(600, audioContext.currentTime);
+            filter.Q.setValueAtTime(1, audioContext.currentTime);
+            
+            osc1.type = 'sine';
+            osc2.type = 'sine';
+            osc3.type = 'sine';
+            
+            osc1.frequency.setValueAtTime(110, audioContext.currentTime);
+            osc2.frequency.setValueAtTime(220, audioContext.currentTime);
+            osc3.frequency.setValueAtTime(165, audioContext.currentTime);
+            
+            gain1.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gain2.gain.setValueAtTime(0.12, audioContext.currentTime);
+            gain3.gain.setValueAtTime(0.1, audioContext.currentTime);
+            
+            masterGain.gain.setValueAtTime(0.4, audioContext.currentTime);
+            
+            osc1.connect(gain1);
+            osc2.connect(gain2);
+            osc3.connect(gain3);
+            
+            gain1.connect(filter);
+            gain2.connect(filter);
+            gain3.connect(filter);
+            
+            filter.connect(masterGain);
+            masterGain.connect(audioContext.destination);
+            
+            osc1.start();
+            osc2.start();
+            osc3.start();
+            
+            ambientSound = { osc1, osc2, osc3, masterGain, filter };
+            
+            const melodyOsc = audioContext.createOscillator();
+            const melodyGain = audioContext.createGain();
+            
+            melodyOsc.type = 'sine';
+            melodyGain.gain.setValueAtTime(0, audioContext.currentTime);
+            
+            melodyOsc.connect(melodyGain);
+            melodyGain.connect(filter);
+            melodyOsc.start();
+            
+            ambientSound.melodyOsc = melodyOsc;
+            ambientSound.melodyGain = melodyGain;
+            
+            const melodyNotes = [220.00, 246.94, 293.66, 329.63, 392.00, 440.00, 493.88, 329.63, 293.66];
+            let noteIndex = 0;
+            
+            setInterval(() => {
+                if (soundEnabled) {
+                    const time = audioContext.currentTime;
+                    
+                    melodyGain.gain.cancelScheduledValues(time);
+                    melodyGain.gain.setValueAtTime(0, time);
+                    melodyGain.gain.linearRampToValueAtTime(0.08, time + 0.5);
+                    melodyGain.gain.linearRampToValueAtTime(0, time + 3);
+                    
+                    melodyOsc.frequency.setValueAtTime(melodyNotes[noteIndex], time);
+                    
+                    noteIndex = (noteIndex + 1) % melodyNotes.length;
+                }
+            }, 5000);
+            
+            setInterval(() => {
+                if (soundEnabled) {
+                    const time = audioContext.currentTime;
+                    
+                    osc1.frequency.setTargetAtTime(110 + Math.sin(Date.now() / 15000) * 3, time, 5);
+                    osc2.frequency.setTargetAtTime(220 + Math.sin(Date.now() / 12000) * 4, time, 6);
+                    osc3.frequency.setTargetAtTime(165 + Math.sin(Date.now() / 18000) * 2, time, 7);
+                    
+                    filter.frequency.setTargetAtTime(550 + Math.sin(Date.now() / 10000) * 100, time, 4);
+                    
+                    const breathe = 0.4 + Math.sin(Date.now() / 20000) * 0.08;
+                    masterGain.gain.setTargetAtTime(breathe, time, 3);
+                }
+            }, 4000);
+        }
+        
+        const soundToggle = document.getElementById('soundToggle');
+        
+        soundToggle.addEventListener('click', () => {
+            if (!soundEnabled) {
+                audioContext.resume();
+                createAmbientSound();
+                soundEnabled = true;
+                soundToggle.innerHTML = '🔊';
+                soundToggle.style.background = 'rgba(50,150,100,0.5)';
+                soundToggle.style.borderColor = 'rgba(100,255,150,0.5)';
+            } else {
+                if (ambientSound) {
+                    ambientSound.masterGain.gain.setValueAtTime(0, audioContext.currentTime);
+                }
+                soundEnabled = false;
+                soundToggle.innerHTML = '🔇';
+                soundToggle.style.background = 'rgba(0,0,0,0.5)';
+                soundToggle.style.borderColor = 'rgba(255,255,255,0.3)';
+            }
+        });
+        
+        soundToggle.addEventListener('mouseenter', () => {
+            soundToggle.style.transform = 'scale(1.05)';
+        });
+        
+        soundToggle.addEventListener('mouseleave', () => {
+            soundToggle.style.transform = 'scale(1)';
+        });
+        
+        const themeToggle = document.getElementById('themeToggle');
+        
+        themeToggle.addEventListener('click', () => {
+            const themeKeys = Object.keys(themes);
+            const currentIndex = themeKeys.indexOf(currentTheme);
+            const nextIndex = (currentIndex + 1) % themeKeys.length;
+            currentTheme = themeKeys[nextIndex];
+            
+            const theme = themes[currentTheme];
+            document.body.style.backgroundImage = theme.gradient;
+        });
+        
+        themeToggle.addEventListener('mouseenter', () => {
+            themeToggle.style.transform = 'scale(1.05)';
+        });
+        
+        themeToggle.addEventListener('mouseleave', () => {
+            themeToggle.style.transform = 'scale(1)';
+        });
+        
+        const infoBtn = document.getElementById('infoBtn');
+        const guideModal = document.getElementById('guideModal');
+        const closeGuide = document.getElementById('closeGuide');
+        
+        infoBtn.addEventListener('click', () => {
+            guideModal.style.display = 'block';
+        });
+        
+        closeGuide.addEventListener('click', () => {
+            guideModal.style.display = 'none';
+        });
+        
+        guideModal.addEventListener('click', (e) => {
+            if (e.target === guideModal) {
+                guideModal.style.display = 'none';
+            }
+        });
+        
+        infoBtn.addEventListener('mouseenter', () => {
+            infoBtn.style.transform = 'scale(1.05)';
+        });
+        
+        infoBtn.addEventListener('mouseleave', () => {
+            infoBtn.style.transform = 'scale(1)';
+        });
+        
+        closeGuide.addEventListener('mouseenter', () => {
+            closeGuide.style.background = 'rgba(100,150,255,0.5)';
+        });
+        
+        closeGuide.addEventListener('mouseleave', () => {
+            closeGuide.style.background = 'rgba(100,150,255,0.3)';
+        });
+        
+        const screenshotBtn = document.getElementById('screenshotBtn');
+        
+        screenshotBtn.addEventListener('click', async () => {
+            try {
+                // Hide UI buttons temporarily
+                soundToggle.style.display = 'none';
+                themeToggle.style.display = 'none';
+                screenshotBtn.style.display = 'none';
+                infoBtn.style.display = 'none';
+                document.querySelector('div[style*="bottom: 20px"]').style.display = 'none';
+                
+                // Create a temporary canvas with background
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Draw background gradient
+                const theme = themes[currentTheme];
+                const gradient = tempCtx.createLinearGradient(0, 0, 0, tempCanvas.height);
+                
+                if (currentTheme === 'blue') {
+                    gradient.addColorStop(0, '#0a0e27');
+                    gradient.addColorStop(0.5, '#1a1a2e');
+                    gradient.addColorStop(1, '#16213e');
+                } else if (currentTheme === 'purple') {
+                    gradient.addColorStop(0, '#1a0a27');
+                    gradient.addColorStop(0.5, '#2e1a3e');
+                    gradient.addColorStop(1, '#3e1647');
+                } else if (currentTheme === 'green') {
+                    gradient.addColorStop(0, '#0a1a1a');
+                    gradient.addColorStop(0.5, '#1a2e2e');
+                    gradient.addColorStop(1, '#16473e');
+                } else if (currentTheme === 'red') {
+                    gradient.addColorStop(0, '#270a0a');
+                    gradient.addColorStop(0.5, '#3e1a1a');
+                    gradient.addColorStop(1, '#471616');
+                }
+                
+                tempCtx.fillStyle = gradient;
+                tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                
+                // Draw the stars and shooting stars on top
+                tempCtx.drawImage(canvas, 0, 0);
+                
+                // Download
+                const link = document.createElement('a');
+                link.download = 'nakshatrapatha-' + themes[currentTheme].name.replace(' ', '-').toLowerCase() + '-' + Date.now() + '.png';
+                link.href = tempCanvas.toDataURL('image/png');
+                link.click();
+                
+                // Show UI buttons again
+                soundToggle.style.display = 'flex';
+                themeToggle.style.display = 'flex';
+                screenshotBtn.style.display = 'flex';
+                infoBtn.style.display = 'flex';
+                document.querySelector('div[style*="bottom: 20px"]').style.display = 'block';
+                
+            } catch (error) {
+                // Show UI buttons again in case of error
+                soundToggle.style.display = 'flex';
+                themeToggle.style.display = 'flex';
+                screenshotBtn.style.display = 'flex';
+                infoBtn.style.display = 'flex';
+                document.querySelector('div[style*="bottom: 20px"]').style.display = 'block';
+                
+                alert('Screenshot saved! If you don\'t see it, check your Downloads folder. Note: Manifestation popups appear briefly and may not always be captured.');
+            }
+        });
+        
+        screenshotBtn.addEventListener('mouseenter', () => {
+            screenshotBtn.style.transform = 'scale(1.05)';
+        });
+        
+        screenshotBtn.addEventListener('mouseleave', () => {
+            screenshotBtn.style.transform = 'scale(1)';
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const x = Math.random() * canvas.width;
+                        const y = Math.random() * canvas.height * 0.5;
+                        shootingStars.push({
+                            x: x,
+                            y: y,
+                            length: Math.random() * 80 + 40,
+                            speed: Math.random() * 8 + 6,
+                            angle: Math.random() * Math.PI / 6 + Math.PI / 6,
+                            opacity: 1,
+                            life: 0
+                        });
+                    }, i * 100);
+                }
+            }
+            
+            if (e.code === 'KeyR') {
+                shootingStarCount = 0;
+                document.getElementById('count').textContent = shootingStarCount;
+            }
+        });
+        
+        const stars = [];
+        const numStars = 250;
+        
+        function initStars() {
+            stars.length = 0;
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    opacity: Math.random() * 0.5 + 0.5,
+                    twinkleSpeed: Math.random() * 0.02 + 0.005,
+                    twinkleDirection: Math.random() > 0.5 ? 1 : -1
+                });
+            }
+        }
+        
+        initStars();
+        
+        const shootingStars = [];
+        let shootingStarCount = 0;
+        
+        const manifestationMessages = [
+            "✨ Your dreams are aligning with the universe",
+            "🌟 Positive energy is flowing your way",
+            "💫 The universe heard your wish",
+            "🌠 Abundance is coming to you",
+            "✨ Your manifestation is in motion",
+            "🌟 Believe in the magic you're creating",
+            "💫 Good things are on their way",
+            "🌠 Your intentions are powerful",
+            "✨ The cosmos is working in your favor",
+            "🌟 Trust the journey ahead",
+            "💫 Your wishes are taking flight",
+            "🌠 Miracles are unfolding for you",
+            "✨ You are exactly where you need to be",
+            "🌟 The universe supports your dreams",
+            "💫 Your light is shining brighter",
+            "🌠 Infinite possibilities await you",
+            "✨ You are a magnet for blessings",
+            "🌟 Your energy is radiant tonight",
+            "💫 Peace and joy are yours",
+            "🌠 Every wish brings you closer",
+            "✨ You deserve all the good coming",
+            "🌟 Your spirit is aligned with abundance",
+            "💫 Beautiful things are manifesting",
+            "🌠 The stars are celebrating with you",
+            "✨ Your heart's desires are heard",
+            "🌟 Keep believing in yourself",
+            "💫 Magic is real and it's yours",
+            "🌠 You are surrounded by love",
+            "✨ Your path is illuminated",
+            "🌟 Gratitude attracts more blessings"
+        ];
+        
+        function showManifestationPopup() {
+            const message = manifestationMessages[Math.floor(Math.random() * manifestationMessages.length)];
+            
+            const popup = document.createElement('div');
+            popup.textContent = message;
+            popup.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0);
+                background: rgba(0, 0, 0, 0.8);
+                color: rgba(255, 255, 255, 0.95);
+                padding: 20px 30px;
+                border-radius: 15px;
+                font-family: Arial, sans-serif;
+                font-size: 18px;
+                text-align: center;
+                backdrop-filter: blur(10px);
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                z-index: 1000;
+                transition: all 0.5s ease;
+                box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            `;
+            
+            document.body.appendChild(popup);
+            
+            setTimeout(() => {
+                popup.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 10);
+            
+            setTimeout(() => {
+                popup.style.transform = 'translate(-50%, -50%) scale(0)';
+                popup.style.opacity = '0';
+            }, 2500);
+            
+            setTimeout(() => {
+                document.body.removeChild(popup);
+            }, 3000);
+        }
+        
+        function createShootingStar() {
+            const startX = Math.random() * canvas.width;
+            const startY = Math.random() * canvas.height * 0.5;
+            
+            shootingStars.push({
+                x: startX,
+                y: startY,
+                length: Math.random() * 80 + 40,
+                speed: Math.random() * 8 + 6,
+                angle: Math.random() * Math.PI / 6 + Math.PI / 6,
+                opacity: 1,
+                life: 0
+            });
+        }
+        
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                createShootingStar();
+            }
+        }, 2000);
+        
+        canvas.addEventListener('click', (e) => {
+            shootingStars.push({
+                x: e.clientX,
+                y: e.clientY,
+                length: Math.random() * 80 + 40,
+                speed: Math.random() * 8 + 6,
+                angle: Math.random() * Math.PI / 6 + Math.PI / 6,
+                opacity: 1,
+                life: 0
+            });
+            
+            shootingStarCount++;
+            document.getElementById('count').textContent = shootingStarCount;
+            
+            if (shootingStarCount % 5 === 0) {
+                showManifestationPopup();
+            }
+            
+            if (soundEnabled) {
+                const clickOsc = audioContext.createOscillator();
+                const clickGain = audioContext.createGain();
+                const clickFilter = audioContext.createBiquadFilter();
+                
+                clickOsc.type = 'sine';
+                clickOsc.frequency.setValueAtTime(200, audioContext.currentTime);
+                
+                clickFilter.type = 'lowpass';
+                clickFilter.frequency.setValueAtTime(400, audioContext.currentTime);
+                
+                const time = audioContext.currentTime;
+                clickGain.gain.setValueAtTime(0, time);
+                clickGain.gain.linearRampToValueAtTime(0.12, time + 0.1);
+                clickGain.gain.exponentialRampToValueAtTime(0.01, time + 1.2);
+                
+                clickOsc.frequency.exponentialRampToValueAtTime(100, time + 1);
+                
+                clickOsc.connect(clickFilter);
+                clickFilter.connect(clickGain);
+                clickGain.connect(audioContext.destination);
+                
+                clickOsc.start(time);
+                clickOsc.stop(time + 1.2);
+            }
+        });
+        
+        function drawStars() {
+            const theme = themes[currentTheme];
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${theme.starColor}, ${star.opacity})`;
+                ctx.fill();
+                
+                star.opacity += star.twinkleSpeed * star.twinkleDirection;
+                if (star.opacity <= 0.2 || star.opacity >= 1) {
+                    star.twinkleDirection *= -1;
+                }
+            });
+        }
+        
+        function drawShootingStars() {
+            const theme = themes[currentTheme];
+            shootingStars.forEach((star, index) => {
+                const gradient = ctx.createLinearGradient(
+                    star.x, star.y,
+                    star.x - Math.cos(star.angle) * star.length,
+                    star.y - Math.sin(star.angle) * star.length
+                );
+                
+                gradient.addColorStop(0, `rgba(${theme.starColor}, ${star.opacity})`);
+                gradient.addColorStop(0.5, `rgba(${theme.starColor}, ${star.opacity * 0.5})`);
+                gradient.addColorStop(1, `rgba(${theme.starColor}, 0)`);
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(star.x, star.y);
+                ctx.lineTo(
+                    star.x - Math.cos(star.angle) * star.length,
+                    star.y - Math.sin(star.angle) * star.length
+                );
+                ctx.stroke();
+                
+                star.x += Math.cos(star.angle) * star.speed;
+                star.y += Math.sin(star.angle) * star.speed;
+                star.life++;
+                
+                if (star.life > 30) {
+                    star.opacity -= 0.05;
+                }
+                
+                if (star.opacity <= 0 || star.x > canvas.width || star.y > canvas.height) {
+                    shootingStars.splice(index, 1);
+                }
+            });
+        }
+        
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawStars();
+            drawShootingStars();
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+        });
+    </script>
+</body>
+</html>
